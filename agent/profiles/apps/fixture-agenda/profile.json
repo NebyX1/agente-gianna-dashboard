@@ -1,0 +1,7 @@
+{
+  "schema_version": "1", "profile_id": "fixture.agenda", "version": "1.0.0",
+  "name": "Agenda de prueba", "business_adapter": "fixture_http_v1",
+  "surface_adapter": "playwright_browser_v1", "auth": "interactive_browser_delegation",
+  "execution": "api", "fields": [], "tools": ["agenda.read.v1"],
+  "locators": "locators.json", "aliases": "aliases.es-UY.json", "workflows": ["workflows/read.json"]
+}

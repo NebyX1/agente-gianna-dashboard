@@ -1,0 +1,1814 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/components/schemas/AgentReceipt",
+  "components": {
+    "schemas": {
+      "TicketCreate": {
+        "type": "object",
+        "properties": {
+          "origin_unit_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Unidad solicitante activa; distinta del destino responsable."
+          },
+          "destination_unit_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Unidad responsable activa y habilitada para recibir tickets."
+          },
+          "problem_type_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Tipo de problema activo del catálogo."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 4000,
+            "description": "Texto plano recortado, nunca HTML; entre 10 y 4000 caracteres en tickets."
+          },
+          "occurred_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "default": null,
+            "description": "Inicio opcional del problema; requiere zona horaria, no futuro; no reemplaza fecha de registro."
+          }
+        },
+        "required": [
+          "origin_unit_id",
+          "destination_unit_id",
+          "problem_type_id",
+          "description"
+        ],
+        "additionalProperties": false,
+        "example": {
+          "origin_unit_id": 3,
+          "destination_unit_id": 1,
+          "problem_type_id": 2,
+          "description": "La impresora no imprime y hace un ruido raro",
+          "occurred_at": null
+        }
+      },
+      "TicketUpdate": {
+        "type": "object",
+        "properties": {
+          "origin_unit_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Unidad solicitante activa; distinta del destino responsable."
+          },
+          "destination_unit_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Unidad responsable activa y habilitada para recibir tickets."
+          },
+          "problem_type_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Tipo de problema activo del catálogo."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 4000,
+            "description": "Texto plano recortado, nunca HTML; entre 10 y 4000 caracteres en tickets."
+          },
+          "occurred_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "default": null,
+            "description": "Inicio opcional del problema; requiere zona horaria, no futuro; no reemplaza fecha de registro."
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Versión esperada en escrituras; DB comprueba e incrementa atómicamente. Conflicto devuelve 409."
+          }
+        },
+        "required": [
+          "origin_unit_id",
+          "destination_unit_id",
+          "problem_type_id",
+          "description",
+          "version"
+        ],
+        "additionalProperties": false
+      },
+      "TicketStatusChange": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Versión esperada en escrituras; DB comprueba e incrementa atómicamente. Conflicto devuelve 409."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "new",
+              "in_progress",
+              "waiting",
+              "resolved",
+              "cancelled"
+            ],
+            "description": "Estado vigente; sólo admite las transiciones publicadas por el contrato."
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 3,
+            "maxLength": 1000,
+            "description": "Solución obligatoria al resolver; motivo obligatorio al cancelar o reabrir."
+          }
+        },
+        "required": [
+          "version",
+          "status"
+        ],
+        "additionalProperties": false,
+        "example": {
+          "status": "resolved",
+          "version": 3,
+          "note": "Se retiró papel atascado y se probó impresión"
+        }
+      },
+      "TicketArchive": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Versión esperada en escrituras; DB comprueba e incrementa atómicamente. Conflicto devuelve 409."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000,
+            "description": "Motivo obligatorio de ocultación o restauración."
+          }
+        },
+        "required": [
+          "version",
+          "reason"
+        ],
+        "additionalProperties": false,
+        "example": {
+          "version": 3,
+          "reason": "Pedido duplicado confirmado"
+        }
+      },
+      "TicketRestore": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Versión esperada en escrituras; DB comprueba e incrementa atómicamente. Conflicto devuelve 409."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000,
+            "description": "Motivo obligatorio de ocultación o restauración."
+          }
+        },
+        "required": [
+          "version",
+          "reason"
+        ],
+        "additionalProperties": false,
+        "example": {
+          "version": 4,
+          "reason": "Restauración autorizada para seguimiento"
+        }
+      },
+      "Login": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254,
+            "description": "Email de la cuenta para autenticación y entrega del OTP."
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "writeOnly": true,
+            "description": "Contraseña enviada exclusivamente por HTTPS, nunca en URL o logs."
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "additionalProperties": false
+      },
+      "Verify": {
+        "type": "object",
+        "properties": {
+          "pending_token": {
+            "type": "string",
+            "maxLength": 2048,
+            "writeOnly": true,
+            "description": "JWT restringido al desafío 2FA vigente; no autoriza negocio y sólo debe persistirse en memoria."
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^\\d{6}$",
+            "writeOnly": true,
+            "description": "Código legible; en catálogos es único e inmutable."
+          }
+        },
+        "required": [
+          "pending_token",
+          "code"
+        ],
+        "additionalProperties": false
+      },
+      "Resend": {
+        "type": "object",
+        "properties": {
+          "pending_token": {
+            "type": "string",
+            "maxLength": 2048,
+            "writeOnly": true,
+            "description": "JWT restringido al desafío 2FA vigente; no autoriza negocio y sólo debe persistirse en memoria."
+          }
+        },
+        "required": [
+          "pending_token"
+        ],
+        "additionalProperties": false
+      },
+      "PasswordChange": {
+        "type": "object",
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "writeOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "new_password": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 256,
+            "writeOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "current_password",
+          "new_password"
+        ],
+        "additionalProperties": false
+      },
+      "OrgUnitCreate": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z0-9_-]{1,32}$",
+            "description": "Código legible; en catálogos es único e inmutable."
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 160,
+            "description": "Etiqueta descriptiva actual."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "area",
+              "office",
+              "municipality"
+            ],
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "is_active": {
+            "type": "boolean",
+            "default": true,
+            "description": "Desactivación lógica: conserva referencias; usuarios desactivados pierden sesiones."
+          },
+          "can_receive_tickets": {
+            "type": "boolean",
+            "default": false,
+            "description": "Habilitación explícita como destino, editable por admin."
+          },
+          "parent_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "default": null,
+            "description": "Relación opcional de unidad; se rechazan ciclos."
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "kind"
+        ],
+        "additionalProperties": false
+      },
+      "ProblemTypeCreate": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z0-9_-]{1,32}$",
+            "description": "Código legible; en catálogos es único e inmutable."
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 160,
+            "description": "Etiqueta descriptiva actual."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 400,
+            "description": "Texto plano recortado, nunca HTML; entre 10 y 4000 caracteres en tickets."
+          },
+          "is_active": {
+            "type": "boolean",
+            "default": true,
+            "description": "Desactivación lógica: conserva referencias; usuarios desactivados pierden sesiones."
+          }
+        },
+        "required": [
+          "code",
+          "name"
+        ],
+        "additionalProperties": false
+      },
+      "UserCreate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120,
+            "description": "Etiqueta descriptiva actual."
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254,
+            "description": "Email de la cuenta para autenticación y entrega del OTP."
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "operator",
+              "viewer"
+            ],
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "is_active": {
+            "type": "boolean",
+            "default": true,
+            "description": "Desactivación lógica: conserva referencias; usuarios desactivados pierden sesiones."
+          },
+          "password": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 256,
+            "writeOnly": true,
+            "description": "Contraseña enviada exclusivamente por HTTPS, nunca en URL o logs."
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "role",
+          "password"
+        ],
+        "additionalProperties": false
+      },
+      "UserUpdate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120,
+            "description": "Etiqueta descriptiva actual."
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "operator",
+              "viewer"
+            ],
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "is_active": {
+            "type": "boolean",
+            "description": "Desactivación lógica: conserva referencias; usuarios desactivados pierden sesiones."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "OrgUnitUpdate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 160,
+            "description": "Etiqueta descriptiva actual."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "area",
+              "office",
+              "municipality"
+            ],
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "is_active": {
+            "type": "boolean",
+            "default": true,
+            "description": "Desactivación lógica: conserva referencias; usuarios desactivados pierden sesiones."
+          },
+          "can_receive_tickets": {
+            "type": "boolean",
+            "default": false,
+            "description": "Habilitación explícita como destino, editable por admin."
+          },
+          "parent_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "default": null,
+            "description": "Relación opcional de unidad; se rechazan ciclos."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "ProblemTypeUpdate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 160,
+            "description": "Etiqueta descriptiva actual."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 400,
+            "description": "Texto plano recortado, nunca HTML; entre 10 y 4000 caracteres en tickets."
+          },
+          "is_active": {
+            "type": "boolean",
+            "default": true,
+            "description": "Desactivación lógica: conserva referencias; usuarios desactivados pierden sesiones."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "OrgUnit": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Identificador estable asignado por la base de datos."
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z0-9_-]{1,32}$",
+            "description": "Código legible; en catálogos es único e inmutable."
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 160,
+            "description": "Etiqueta descriptiva actual."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "area",
+              "office",
+              "municipality"
+            ],
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "is_active": {
+            "type": "boolean",
+            "default": true,
+            "description": "Desactivación lógica: conserva referencias; usuarios desactivados pierden sesiones."
+          },
+          "can_receive_tickets": {
+            "type": "boolean",
+            "default": false,
+            "description": "Habilitación explícita como destino, editable por admin."
+          },
+          "parent_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "default": null,
+            "description": "Relación opcional de unidad; se rechazan ciclos."
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "kind",
+          "is_active",
+          "can_receive_tickets",
+          "parent_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProblemType": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Identificador estable asignado por la base de datos."
+          },
+          "code": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Código legible; en catálogos es único e inmutable."
+          },
+          "name": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Etiqueta descriptiva actual."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Texto plano recortado, nunca HTML; entre 10 y 4000 caracteres en tickets."
+          },
+          "is_active": {
+            "type": "boolean",
+            "description": "Desactivación lógica: conserva referencias; usuarios desactivados pierden sesiones."
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "description",
+          "is_active"
+        ],
+        "additionalProperties": false
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Identificador estable asignado por la base de datos."
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email de la cuenta para autenticación y entrega del OTP."
+          },
+          "name": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Etiqueta descriptiva actual."
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "operator",
+              "viewer"
+            ],
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "is_active": {
+            "type": "boolean",
+            "description": "Desactivación lógica: conserva referencias; usuarios desactivados pierden sesiones."
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "name",
+          "role",
+          "is_active"
+        ],
+        "additionalProperties": false
+      },
+      "StatusDefinition": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "new",
+              "in_progress",
+              "waiting",
+              "resolved",
+              "cancelled"
+            ],
+            "readOnly": true,
+            "description": "Código legible; en catálogos es único e inmutable."
+          },
+          "label": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "transitions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "new",
+                "in_progress",
+                "waiting",
+                "resolved",
+                "cancelled"
+              ],
+              "readOnly": true
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "code",
+          "label",
+          "transitions"
+        ],
+        "additionalProperties": false
+      },
+      "TicketRead": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Identificador estable asignado por la base de datos."
+          },
+          "code": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Código legible; en catálogos es único e inmutable."
+          },
+          "origin_unit_id": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Unidad solicitante activa; distinta del destino responsable."
+          },
+          "destination_unit_id": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Unidad responsable activa y habilitada para recibir tickets."
+          },
+          "problem_type_id": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Tipo de problema activo del catálogo."
+          },
+          "origin": {
+            "$ref": "#/components/schemas/OrgUnit",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "destination": {
+            "$ref": "#/components/schemas/OrgUnit",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "problem_type": {
+            "$ref": "#/components/schemas/ProblemType",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 4000,
+            "readOnly": true,
+            "description": "Texto plano recortado, nunca HTML; entre 10 y 4000 caracteres en tickets."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "new",
+              "in_progress",
+              "waiting",
+              "resolved",
+              "cancelled"
+            ],
+            "readOnly": true,
+            "description": "Estado vigente; sólo admite las transiciones publicadas por el contrato."
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Versión esperada en escrituras; DB comprueba e incrementa atómicamente. Conflicto devuelve 409."
+          },
+          "created_by_user_id": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Usuario de sesión autenticada, asignado por servidor."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-04T12:00:00Z",
+            "readOnly": true,
+            "description": "Instante UTC de registro, inmutable y asignado por servidor. JSON con Z u offset."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-04T12:00:00Z",
+            "readOnly": true,
+            "description": "Instante UTC de última operación confirmada."
+          },
+          "first_response_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "readOnly": true,
+            "description": "Primera entrada a En curso; se conserva al reabrir."
+          },
+          "resolved_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "readOnly": true,
+            "description": "Cierre resuelto vigente; al reabrir se limpia y queda en historia."
+          },
+          "cancelled_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "readOnly": true,
+            "description": "Cierre cancelado vigente; al reabrir se limpia y queda en historia."
+          },
+          "occurred_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "readOnly": true,
+            "description": "Inicio opcional del problema; requiere zona horaria, no futuro; no reemplaza fecha de registro."
+          },
+          "archived_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "readOnly": true,
+            "description": "Ocultación lógica separada del estado; excluye de operación y pantalla."
+          },
+          "archived_by_user_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "archive_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "origin_unit_id",
+          "destination_unit_id",
+          "problem_type_id",
+          "origin",
+          "destination",
+          "problem_type",
+          "description",
+          "status",
+          "version",
+          "created_by_user_id",
+          "created_at",
+          "updated_at",
+          "first_response_at",
+          "resolved_at",
+          "cancelled_at",
+          "occurred_at",
+          "archived_at",
+          "archived_by_user_id",
+          "archive_reason"
+        ],
+        "additionalProperties": false
+      },
+      "DisplayTicket": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Identificador estable asignado por la base de datos."
+          },
+          "code": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Código legible; en catálogos es único e inmutable."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "new",
+              "in_progress",
+              "waiting",
+              "resolved",
+              "cancelled"
+            ],
+            "readOnly": true,
+            "description": "Estado vigente; sólo admite las transiciones publicadas por el contrato."
+          },
+          "origin": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "minimum": 1,
+                "readOnly": true
+              },
+              "name": {
+                "type": "string",
+                "readOnly": true
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "additionalProperties": false,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "destination": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "minimum": 1,
+                "readOnly": true
+              },
+              "name": {
+                "type": "string",
+                "readOnly": true
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "additionalProperties": false,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "problem_type": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "minimum": 1,
+                "readOnly": true
+              },
+              "name": {
+                "type": "string",
+                "readOnly": true
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "additionalProperties": false,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-04T12:00:00Z",
+            "readOnly": true,
+            "description": "Instante UTC de registro, inmutable y asignado por servidor. JSON con Z u offset."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-04T12:00:00Z",
+            "readOnly": true,
+            "description": "Instante UTC de última operación confirmada."
+          },
+          "description_preview": {
+            "type": "string",
+            "maxLength": 400,
+            "description": "Primeros 400 caracteres determinísticos de la descripción, texto plano."
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "status",
+          "origin",
+          "destination",
+          "problem_type",
+          "created_at",
+          "updated_at",
+          "description_preview"
+        ],
+        "additionalProperties": false
+      },
+      "TicketEvent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Identificador estable asignado por la base de datos."
+          },
+          "ticket_id": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "actor_user_id": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "actor_name": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "event_type": {
+            "type": "string",
+            "enum": [
+              "created",
+              "edited",
+              "status_changed",
+              "reopened",
+              "archived",
+              "restored"
+            ],
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-04T12:00:00Z",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "request_id": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "manual_ui",
+              "voice_agent"
+            ],
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "before": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TicketRead"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "after": {
+            "$ref": "#/components/schemas/TicketRead",
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Solución obligatoria al resolver; motivo obligatorio al cancelar o reabrir."
+          }
+        },
+        "required": [
+          "id",
+          "ticket_id",
+          "actor_user_id",
+          "actor_name",
+          "event_type",
+          "timestamp",
+          "request_id",
+          "channel",
+          "before",
+          "after",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": false,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "readOnly": true
+              },
+              "message": {
+                "type": "string",
+                "readOnly": true
+              },
+              "errors": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "readOnly": true
+                  }
+                }
+              },
+              "details": {}
+            },
+            "required": [
+              "code",
+              "message",
+              "errors"
+            ],
+            "additionalProperties": false,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "request_id": {
+                "type": "string",
+                "readOnly": true
+              }
+            },
+            "required": [
+              "request_id"
+            ],
+            "additionalProperties": false,
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "ok",
+          "error",
+          "meta"
+        ],
+        "additionalProperties": false
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "page",
+          "per_page",
+          "total",
+          "pages"
+        ],
+        "additionalProperties": false
+      },
+      "TicketPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TicketRead"
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "per_page",
+          "total",
+          "pages"
+        ],
+        "additionalProperties": false
+      },
+      "EventPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TicketEvent"
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "per_page",
+          "total",
+          "pages"
+        ],
+        "additionalProperties": false
+      },
+      "Catalogs": {
+        "type": "object",
+        "properties": {
+          "org_units": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrgUnit"
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "problem_types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProblemType"
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "statuses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatusDefinition"
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "default_destination_unit_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "readOnly": true
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "org_units",
+          "problem_types",
+          "statuses",
+          "default_destination_unit_id",
+          "warnings"
+        ],
+        "additionalProperties": false
+      },
+      "PendingAuth": {
+        "type": "object",
+        "properties": {
+          "pending_token": {
+            "type": "string",
+            "readOnly": true,
+            "description": "JWT restringido al desafío 2FA vigente; no autoriza negocio y sólo debe persistirse en memoria."
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "resend_after": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "pending_token",
+          "expires_in",
+          "resend_after"
+        ],
+        "additionalProperties": false
+      },
+      "SessionAuth": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-04T12:00:00Z",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "user": {
+            "$ref": "#/components/schemas/User",
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "access_token",
+          "expires_in",
+          "expires_at",
+          "user"
+        ],
+        "additionalProperties": false
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "additionalProperties": false
+      },
+      "AgentSessionInput": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "AgentSession": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-04T12:00:00Z",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "client_id": {
+            "const": "gianna-agent",
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "scope": {
+            "const": [
+              "tickets"
+            ],
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "user": {
+            "$ref": "#/components/schemas/User",
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "access_token",
+          "expires_at",
+          "client_id",
+          "scope",
+          "user"
+        ],
+        "additionalProperties": false
+      },
+      "AgentReceipt": {
+        "type": "object",
+        "properties": {
+          "operation_id": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "tool": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "payload_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$",
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "ticket_id": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "code": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Código legible; en catálogos es único e inmutable."
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Versión esperada en escrituras; DB comprueba e incrementa atómicamente. Conflicto devuelve 409."
+          },
+          "status": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Estado vigente; sólo admite las transiciones publicadas por el contrato."
+          },
+          "event_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "readOnly": true
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "committed_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-04T12:00:00Z",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "server_request_id": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "operation_id",
+          "tool",
+          "payload_hash",
+          "ticket_id",
+          "code",
+          "version",
+          "status",
+          "event_ids",
+          "committed_at",
+          "server_request_id"
+        ],
+        "additionalProperties": false
+      },
+      "DisplayConfig": {
+        "type": "object",
+        "properties": {
+          "statuses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatusDefinition"
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "destinations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "readOnly": true
+                },
+                "name": {
+                  "type": "string",
+                  "readOnly": true
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "timezone": {
+            "const": "America/Montevideo",
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "statuses",
+          "destinations",
+          "timezone"
+        ],
+        "additionalProperties": false
+      },
+      "DisplayResult": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DisplayTicket"
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-04T12:00:00Z",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "generated_at"
+        ],
+        "additionalProperties": false
+      },
+      "ArchiveReceipt": {
+        "type": "object",
+        "properties": {
+          "ticket_id": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "operation": {
+            "const": "archive",
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "archived_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-04T12:00:00Z",
+            "readOnly": true,
+            "description": "Ocultación lógica separada del estado; excluye de operación y pantalla."
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Versión esperada en escrituras; DB comprueba e incrementa atómicamente. Conflicto devuelve 409."
+          }
+        },
+        "required": [
+          "ticket_id",
+          "operation",
+          "archived_at",
+          "version"
+        ],
+        "additionalProperties": false
+      },
+      "Group": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "readOnly": true,
+            "description": "Identificador estable asignado por la base de datos."
+          },
+          "name": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Etiqueta descriptiva actual."
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "count"
+        ],
+        "additionalProperties": false
+      },
+      "Problems": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Group"
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "Summary": {
+        "type": "object",
+        "properties": {
+          "created": {
+            "type": "integer",
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "resolved": {
+            "type": "integer",
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "cancelled": {
+            "type": "integer",
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "archived": {
+            "type": "integer",
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "average_resolution_seconds": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "active_by_status": {
+            "type": "object",
+            "properties": {
+              "new": {
+                "type": "integer"
+              },
+              "in_progress": {
+                "type": "integer"
+              },
+              "waiting": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "new",
+              "in_progress",
+              "waiting"
+            ],
+            "additionalProperties": false,
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "daily": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "count": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "date",
+                "count"
+              ],
+              "additionalProperties": false
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "origins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Group"
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "destinations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Group"
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          },
+          "definition": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "created",
+          "resolved",
+          "cancelled",
+          "archived",
+          "average_resolution_seconds",
+          "active_by_status",
+          "daily",
+          "origins",
+          "destinations",
+          "definition"
+        ],
+        "additionalProperties": false
+      },
+      "OrgUnitList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrgUnit"
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "ProblemTypeList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProblemType"
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "UserList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            },
+            "description": "Campo del resultado documentado de esta operación."
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

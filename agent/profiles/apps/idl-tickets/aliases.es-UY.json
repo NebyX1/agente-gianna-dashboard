@@ -1,0 +1,4 @@
+{
+ "schema_version":"1", "origin_unit_id":{"TRANSITO":["tránsito","transito"],"TI":["informática","informatica"],"URBANISMO":["urbanismo"]},
+ "problem_type_id":{"IMPRESORA":["impresora","impresoras","no imprime"],"INTERNET":["internet","conectividad","conexión"],"HARDWARE":["hardware","computadora","equipo"],"SISTEMAS":["acceso a sistemas","contraseña"]}
+}

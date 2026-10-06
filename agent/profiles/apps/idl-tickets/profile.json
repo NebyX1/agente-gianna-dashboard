@@ -1,0 +1,8 @@
+{
+ "schema_version":"1","profile_id":"idl.tickets","version":"1.0.0","name":"Mesa de ayuda · IDL",
+ "business_adapter":"idl_tickets_http_v1","surface_adapter":"playwright_browser_v1",
+ "auth":"interactive_browser_delegation","execution":"api",
+ "fields":["origin_unit_id","destination_unit_id","problem_type_id","description","occurred_at"],
+ "tools":["tickets.catalogs.v1","tickets.search.v1","tickets.read.v1","tickets.history.v1","tickets.create.v1","tickets.update.v1","tickets.status.v1","tickets.archive.v1","tickets.restore.v1","browser.open.v1","browser.show.v1","browser.filter.v1","browser.prepare.v1","dialogue.repeat.v1","dialogue.pause.v1","dialogue.resume.v1"],
+ "locators":"locators.json","aliases":"aliases.es-UY.json","workflows":["workflows/create.json"]
+}

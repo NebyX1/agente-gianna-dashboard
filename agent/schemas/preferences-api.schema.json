@@ -1,0 +1,55 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "speed": {
+      "maximum": 1.4,
+      "minimum": 0.65,
+      "title": "Speed",
+      "type": "number"
+    },
+    "quiet": {
+      "title": "Quiet",
+      "type": "boolean"
+    },
+    "volume": {
+      "default": 0.85,
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Volume",
+      "type": "number"
+    },
+    "text_size": {
+      "default": 18,
+      "maximum": 28,
+      "minimum": 16,
+      "title": "Text Size",
+      "type": "integer"
+    },
+    "high_contrast": {
+      "default": false,
+      "title": "High Contrast",
+      "type": "boolean"
+    },
+    "echo_cancellation": {
+      "default": true,
+      "title": "Echo Cancellation",
+      "type": "boolean"
+    },
+    "noise_suppression": {
+      "default": false,
+      "title": "Noise Suppression",
+      "type": "boolean"
+    },
+    "auto_gain_control": {
+      "default": false,
+      "title": "Auto Gain Control",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "speed",
+    "quiet"
+  ],
+  "title": "Preferences",
+  "type": "object"
+}

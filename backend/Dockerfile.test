@@ -1,0 +1,10 @@
+FROM idl-tickets-backend
+USER root
+COPY requirements-dev.txt .
+RUN pip install --no-cache-dir -r requirements-dev.txt
+COPY --chown=appuser:appuser tests tests
+COPY --chown=appuser:appuser contracts contracts
+COPY pyproject.toml .
+RUN mkdir -p /app/.pytest_cache && chown -R appuser:appuser /app/.pytest_cache
+USER appuser
+ENTRYPOINT ["python", "-m", "pytest"]

@@ -1,0 +1,83 @@
+{
+  "$defs": {
+    "PlanStep": {
+      "additionalProperties": false,
+      "properties": {
+        "tool_id": {
+          "title": "Tool Id",
+          "type": "string"
+        },
+        "arguments": {
+          "additionalProperties": true,
+          "title": "Arguments",
+          "type": "object"
+        },
+        "resource": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "pattern": "^tickets(?:/[1-9][0-9]*)?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resource"
+        }
+      },
+      "required": [
+        "tool_id",
+        "arguments"
+      ],
+      "title": "PlanStep",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "kind": {
+      "enum": [
+        "explanation",
+        "rewrite",
+        "plan"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "explanation": {
+      "maxLength": 3000,
+      "minLength": 1,
+      "title": "Explanation",
+      "type": "string"
+    },
+    "description": {
+      "anyOf": [
+        {
+          "maxLength": 4000,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Description"
+    },
+    "steps": {
+      "items": {
+        "$ref": "#/$defs/PlanStep"
+      },
+      "maxItems": 4,
+      "title": "Steps",
+      "type": "array"
+    }
+  },
+  "required": [
+    "kind",
+    "explanation"
+  ],
+  "title": "Proposal",
+  "type": "object"
+}

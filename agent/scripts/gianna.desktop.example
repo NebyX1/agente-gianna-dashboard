@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Gianna · Mesa de ayuda
+Comment=Asistente de voz de la Intendencia de Lavalleja
+Exec=/ABSOLUTE/PATH/Gianna-Tickets/agent/scripts/start.sh
+Terminal=true
+Categories=Office;Accessibility;

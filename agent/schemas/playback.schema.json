@@ -1,0 +1,19 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "utterance_id": {
+      "title": "Utterance Id",
+      "type": "string"
+    },
+    "generation_id": {
+      "title": "Generation Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "utterance_id",
+    "generation_id"
+  ],
+  "title": "Playback",
+  "type": "object"
+}

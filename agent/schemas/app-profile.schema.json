@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version","profile_id","version","name","business_adapter","surface_adapter","auth","execution","fields","tools","locators","aliases","workflows"],
+  "properties": {
+    "schema_version":{"const":"1"}, "profile_id":{"type":"string","pattern":"^[a-z][a-z0-9.]+$"},
+    "version":{"type":"string","pattern":"^1\\.[0-9]+\\.[0-9]+$"}, "name":{"type":"string","maxLength":100},
+    "business_adapter":{"enum":["idl_tickets_http_v1","fixture_http_v1"]},
+    "surface_adapter":{"const":"playwright_browser_v1"},
+    "auth":{"const":"interactive_browser_delegation"}, "execution":{"const":"api"},
+    "fields":{"type":"array","items":{"enum":["origin_unit_id","destination_unit_id","problem_type_id","description","occurred_at"]},"uniqueItems":true},
+    "tools":{"type":"array","maxItems":32,"uniqueItems":true,"items":{"type":"string","pattern":"^[a-z][a-z_.]+\\.v1$"}},
+    "locators":{"type":"string","pattern":"^[a-zA-Z0-9_.-]+\\.json$"},
+    "aliases":{"type":"string","pattern":"^[a-zA-Z0-9_.-]+\\.json$"},
+    "workflows":{"type":"array","maxItems":8,"items":{"type":"string","pattern":"^workflows/[a-z-]+\\.json$"}}
+  }
+}

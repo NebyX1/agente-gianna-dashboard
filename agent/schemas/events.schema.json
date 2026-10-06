@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "kind",
+    "session_id",
+    "turn_id",
+    "generation_id",
+    "at",
+    "data"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "kind": {
+      "type": "string",
+      "pattern": "^[a-z_]+$"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "turn_id": {
+      "type": "string"
+    },
+    "generation_id": {
+      "type": "string"
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "data": {
+      "type": "object"
+    }
+  }
+}

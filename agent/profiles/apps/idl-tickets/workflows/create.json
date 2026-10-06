@@ -1,0 +1,5 @@
+[
+ {"primitive":"tickets.catalogs.v1","arguments":{}},
+ {"primitive":"browser.prepare.v1","arguments":{}},
+ {"primitive":"tickets.create.v1","arguments":{}}
+]

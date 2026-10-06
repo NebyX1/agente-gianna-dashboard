@@ -1,0 +1,22 @@
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { expect, it, vi } from 'vitest';
+import { useStatusChange } from '../src/api/hooks/useTickets';
+import { patch } from '../src/api/axios';
+import { queryClient } from '../src/api/queryClient';
+import type { Ticket } from '../src/types';
+vi.mock('../src/api/axios', () => ({ patch: vi.fn(), get: vi.fn(), errorMessage: () => 'Otra persona cambió el ticket' }));
+it('revierte el estado optimista ante conflicto y solicita revalidación', async () => {
+  queryClient.clear();
+  const ticket: Ticket = { id: 1,code:'IDL-TI-000001',origin_unit_id:1,destination_unit_id:1,problem_type_id:1,description:'Descripción de prueba suficiente',status:'new',version:1,created_by_user_id:1,created_at:'2026-10-04T12:00:00Z',updated_at:'2026-10-04T12:00:00Z',occurred_at:null,first_response_at:null,resolved_at:null,cancelled_at:null,archived_at:null,archived_by_user_id:null,archive_reason:null,origin:{id:1,code:'TI',name:'Informática',kind:'area',is_active:true,can_receive_tickets:true,parent_id:null},destination:{id:1,code:'TI',name:'Informática',kind:'area',is_active:true,can_receive_tickets:true,parent_id:null},problem_type:{id:1,code:'IMP',name:'Impresora',description:null,is_active:true} };
+  const key = ['tickets',false,{}]; const page = {items:[ticket],page:1,per_page:30,total:1,pages:1}; queryClient.setQueryData(key,page);
+  let rejectRequest: (error: Error) => void = () => {};
+  vi.mocked(patch).mockImplementation(() => new Promise((_,reject) => { rejectRequest = reject; }));
+  const invalidate = vi.spyOn(queryClient,'invalidateQueries');
+  const { result } = renderHook(useStatusChange,{wrapper:({children}) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>});
+  act(() => result.current.mutate({ticket,status:'in_progress'}));
+  await waitFor(() => expect(queryClient.getQueryData<typeof page>(key)?.items[0].status).toBe('in_progress'));
+  act(() => rejectRequest(new Error('version_conflict')));
+  await waitFor(() => expect(result.current.isError).toBe(true));
+  expect(queryClient.getQueryData<typeof page>(key)?.items[0].status).toBe('new'); expect(invalidate).toHaveBeenCalledWith({queryKey:['history']}); queryClient.clear();
+});

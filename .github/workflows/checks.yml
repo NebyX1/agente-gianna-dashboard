@@ -1,0 +1,66 @@
+name: Verificación
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  agent:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: agent
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with: {version: '0.10.7', python-version: '3.12'}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.23.3
+          cache: npm
+          cache-dependency-path: agent/ui/package-lock.json
+      - run: uv sync --locked
+      - run: uv run ruff check src tests scripts
+      - run: uv run pytest tests/unit tests/contracts -q
+      - run: uv run python scripts/export_schemas.py --check
+      - run: npm --prefix ui ci
+      - run: npm --prefix ui run lint && npm --prefix ui run typecheck && npm --prefix ui test && npm --prefix ui run build
+  clients:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [frontend, visualizer]
+    defaults:
+      run:
+        working-directory: ${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.23.3
+          cache: npm
+          cache-dependency-path: ${{ matrix.app }}/package-lock.json
+      - run: cp .env.example .env
+      - run: npm ci
+      - run: npm run typecheck && npm run lint && npm test && npm run contract:check && npm run build
+      - run: TZ=UTC npm test && TZ=Pacific/Auckland npm test
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22.23.3 }
+      - run: python -m pip install ruff==0.15.6
+      - run: ruff check backend scripts
+      - run: python scripts/init-local.py
+      - run: python scripts/test-backend.py
+      - run: python scripts/start-e2e.py
+      - run: npm ci && npx playwright install --with-deps chromium && npm test
+        working-directory: e2e
+      - run: python scripts/verify-persistence.py
+      - run: python scripts/verify-readiness.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidencia-playwright
+          path: e2e/test-results

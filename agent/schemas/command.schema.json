@@ -1,0 +1,33 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "enum": [
+        "activate",
+        "text",
+        "pause",
+        "stop_voice",
+        "repeat",
+        "open_board",
+        "handoff",
+        "reconcile",
+        "logout",
+        "return_to_task",
+        "reset_conversation"
+      ],
+      "title": "Action",
+      "type": "string"
+    },
+    "text": {
+      "default": "",
+      "maxLength": 4000,
+      "title": "Text",
+      "type": "string"
+    }
+  },
+  "required": [
+    "action"
+  ],
+  "title": "Command",
+  "type": "object"
+}

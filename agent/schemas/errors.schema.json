@@ -1,0 +1,21 @@
+{
+  "type": "string",
+  "enum": [
+    "audio_unavailable",
+    "stt_unavailable",
+    "tts_unavailable",
+    "decision_unavailable",
+    "clarification_required",
+    "authentication_required",
+    "permission_denied",
+    "validation_error",
+    "version_conflict",
+    "idempotency_conflict",
+    "rate_limited",
+    "ui_contract_changed",
+    "deadline_exceeded",
+    "commit_outcome_unknown",
+    "unsupported_capability",
+    "tickets_unavailable"
+  ]
+}

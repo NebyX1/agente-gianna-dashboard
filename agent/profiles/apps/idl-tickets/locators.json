@@ -1,0 +1,9 @@
+{
+ "contract_version":"1","board":{"role":"heading","name":"Solicitudes del equipo"},
+ "detail":{"test_id":"ticket-detail"},
+ "search":{"role":"textbox","name":"Buscar tickets por código o descripción"},
+ "form":{"test_id":"ticket-form"}, "preview":{"test_id":"gianna-preview"},
+ "origin":{"label":"Origen del pedido"},"destination":{"label":"Destino responsable"},
+ "type":{"label":"Tipo de problema"},"description":{"label":"Descripción del problema"},
+ "submit":{"test_id":"ticket-submit"}
+}

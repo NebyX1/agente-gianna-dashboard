@@ -1,0 +1,46 @@
+name: Gianna · modelos y voz real
+on:
+  workflow_dispatch:
+    inputs:
+      models_gpu_ready:
+        description: 'Runner con CUDA, audio verificado, Ollama Cloud y servicios aislados 5400/5473/5474/8027'
+        required: true
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  real-models:
+    if: inputs.models_gpu_ready
+    runs-on: [self-hosted, windows, x64, gianna-gpu]
+    defaults:
+      run:
+        working-directory: agent
+    env:
+      GIANNA_REAL_E2E: '1'
+      GIANNA_INTERPRETER_BACKEND: 'cloud'
+      OLLAMA_MODEL: 'deepseek-v4.1-flash:cloud'
+      OLLAMA_API_KEY: ${{ secrets.OLLAMA_API_KEY }}
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with: {version: '0.10.7', python-version: '3.12'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22.23.3'}
+      - run: uv sync --locked
+      - run: .venv/Scripts/python.exe -m playwright install chromium
+      - run: npm --prefix ui ci
+      - run: |
+          . ../scripts/windows-toolchain.ps1
+          npm --prefix ui run build
+      - run: .venv/Scripts/python.exe scripts/prepare-integration.py
+      - run: .venv/Scripts/python.exe -m gianna models verify
+      - run: |
+          if (!$env:OLLAMA_API_KEY) { throw 'Configurá el secret OLLAMA_API_KEY para las pruebas Cloud' }
+      - run: .venv/Scripts/python.exe -m pytest tests/integration tests/e2e -q
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gianna-models-evidence
+          path: artifacts/gianna-*

@@ -1,0 +1,102 @@
+{
+  "format_version": 1,
+  "whisper_repo": "dropbox-dash/faster-whisper-large-v3-turbo",
+  "whisper_revision": "0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+  "piper_repo": "rhasspy/piper-voices",
+  "piper_revision": "c10ece1aade47bb51c153c893d14e5bf8e5b7117",
+  "piper_runtime": "1.4.2",
+  "pipecat_runtime": "1.10.0",
+  "smart_turn_source": "pipecat-ai 1.10.0 distribution",
+  "files": {
+    "smart-turn-v3.2-cpu.onnx": {
+      "sha256": "2bb026316b14a660486a75b1733cd3fbab8c2fd0314dc9af7be49f8cca967e4f",
+      "size": 8679182,
+      "source": "pipecat-ai==1.10.0 wheel",
+      "revision": "1.10.0",
+      "license": "BSD-2-Clause",
+      "license_source": "https://huggingface.co/pipecat-ai/smart-turn-v3"
+    },
+    "piper/es_AR-daniela-high.onnx": {
+      "sha256": "7ceb1fc0dab349418c5b54a639ae9ee595212d7c9ea422220d8419163d5cc985",
+      "size": 114199011,
+      "source": "https://huggingface.co/rhasspy/piper-voices/tree/c10ece1aade47bb51c153c893d14e5bf8e5b7117/es/es_AR/daniela/high",
+      "revision": "c10ece1aade47bb51c153c893d14e5bf8e5b7117",
+      "license": "Voice card: dataset CC-BY-SA-4.0; repository tag MIT is not a separate voice-weights grant",
+      "license_source": "https://huggingface.co/rhasspy/piper-voices/blob/c10ece1aade47bb51c153c893d14e5bf8e5b7117/es/es_AR/daniela/high/MODEL_CARD"
+    },
+    "piper/es_AR-daniela-high.onnx.json": {
+      "sha256": "aedbf69647e1d754c62ecf8e0366ca5f16af3e768e3c6b5329af6eb6bde3852b",
+      "size": 7248,
+      "source": "https://huggingface.co/rhasspy/piper-voices/tree/c10ece1aade47bb51c153c893d14e5bf8e5b7117/es/es_AR/daniela/high",
+      "revision": "c10ece1aade47bb51c153c893d14e5bf8e5b7117",
+      "license": "Voice card: dataset CC-BY-SA-4.0; repository tag MIT is not a separate voice-weights grant",
+      "license_source": "https://huggingface.co/rhasspy/piper-voices/blob/c10ece1aade47bb51c153c893d14e5bf8e5b7117/es/es_AR/daniela/high/MODEL_CARD"
+    },
+    "piper/MODEL_CARD": {
+      "sha256": "39fda44bb85009b0bd7aabb455b113e50abf1f2a2013f3264c482691105e4e3b",
+      "size": 353,
+      "source": "https://huggingface.co/rhasspy/piper-voices/tree/c10ece1aade47bb51c153c893d14e5bf8e5b7117/es/es_AR/daniela/high",
+      "revision": "c10ece1aade47bb51c153c893d14e5bf8e5b7117",
+      "license": "Voice card: dataset CC-BY-SA-4.0; repository tag MIT is not a separate voice-weights grant",
+      "license_source": "https://huggingface.co/rhasspy/piper-voices/blob/c10ece1aade47bb51c153c893d14e5bf8e5b7117/es/es_AR/daniela/high/MODEL_CARD"
+    },
+    "whisper-large-v3-turbo/config.json": {
+      "sha256": "b0253ea6c0d3bea6b1e19e91a02acfd3b53f4467362efcb5a3e6b16c9b3a9b7e",
+      "size": 2263,
+      "source": "https://huggingface.co/dropbox-dash/faster-whisper-large-v3-turbo/tree/0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+      "revision": "0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+      "license": "MIT (Whisper model/code; CT2 conversion)",
+      "license_source": "https://github.com/openai/whisper/blob/main/LICENSE"
+    },
+    "whisper-large-v3-turbo/model.bin": {
+      "sha256": "e76620f83d5f5b69efd3d87e3dc180c1bd21df9fbebacfd4335e5e1efcc018da",
+      "size": 1617884929,
+      "source": "https://huggingface.co/dropbox-dash/faster-whisper-large-v3-turbo/tree/0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+      "revision": "0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+      "license": "MIT (Whisper model/code; CT2 conversion)",
+      "license_source": "https://github.com/openai/whisper/blob/main/LICENSE"
+    },
+    "whisper-large-v3-turbo/preprocessor_config.json": {
+      "sha256": "7ccc62c6f2765af1f3b46c00c9b5894426835a05021c8b9c01eecb6dfb542711",
+      "size": 340,
+      "source": "https://huggingface.co/dropbox-dash/faster-whisper-large-v3-turbo/tree/0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+      "revision": "0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+      "license": "MIT (Whisper model/code; CT2 conversion)",
+      "license_source": "https://github.com/openai/whisper/blob/main/LICENSE"
+    },
+    "whisper-large-v3-turbo/README.md": {
+      "sha256": "b3068692728faed23580cce5cd569fc47ff76c690c032b2641ffd5554ea64d8f",
+      "size": 1445,
+      "source": "https://huggingface.co/dropbox-dash/faster-whisper-large-v3-turbo/tree/0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+      "revision": "0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+      "license": "MIT (Whisper model/code; CT2 conversion)",
+      "license_source": "https://github.com/openai/whisper/blob/main/LICENSE"
+    },
+    "whisper-large-v3-turbo/tokenizer.json": {
+      "sha256": "297b13372ac43916285644fb9687add3cc62ee2a1adb60da3dc25cc94c1871fd",
+      "size": 2710337,
+      "source": "https://huggingface.co/dropbox-dash/faster-whisper-large-v3-turbo/tree/0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+      "revision": "0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+      "license": "MIT (Whisper model/code; CT2 conversion)",
+      "license_source": "https://github.com/openai/whisper/blob/main/LICENSE"
+    },
+    "whisper-large-v3-turbo/vocabulary.json": {
+      "sha256": "c69260f2ab26d659b7c398f9a2b2b48ed0df16c3b47d7326782fd9cba71690c1",
+      "size": 1068114,
+      "source": "https://huggingface.co/dropbox-dash/faster-whisper-large-v3-turbo/tree/0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+      "revision": "0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+      "license": "MIT (Whisper model/code; CT2 conversion)",
+      "license_source": "https://github.com/openai/whisper/blob/main/LICENSE"
+    }
+  },
+  "licenses": {
+    "piper_runtime": "GPL-3.0-or-later (installed distribution metadata)",
+    "pipecat_runtime": "BSD-2-Clause",
+    "faster_whisper": "MIT",
+    "ctranslate2": "MIT",
+    "tev_code": "MIT",
+    "tev_base": "Qwen3.5-0.8B Apache-2.0",
+    "tev_weights": "Experimental release license being finalized in model card; do not infer from code/base",
+    "hermes_patterns": "MIT; independent harness, no imported AIAgent internals"
+  }
+}
