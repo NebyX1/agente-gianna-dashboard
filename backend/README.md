@@ -28,6 +28,8 @@ docker build -t idl-tickets-backend .
 
 El runtime requiere `DATABASE_URI=mariadb+mariadbconnector://...`, `SECRET_KEY`, `JWT_SECRET_KEY`, `FRONTEND_URL`, `CORS_ORIGINS`, Redis y SMTP. `.env.example` contiene todos los nombres; los marcadores no son credenciales funcionales. La imagen ejecuta Gunicorn no root y migra antes de iniciar cuando `RUN_MIGRATIONS=true`. Para varias réplicas migrar una sola vez y configurar `false` en todas las réplicas. `/healthz` comprueba proceso; `/readyz` comprueba DB, esquema y almacenamiento de límites.
 
+La comprobación de dependencias de `/readyz` espera como máximo 3 segundos en el servidor y devuelve `503 not_ready` si una dependencia falla o no responde a tiempo. Mantiene como máximo un sondeo pendiente por proceso, con su propio contexto y sesión de base de datos, hasta que termine la llamada nativa. Esto evita acumular sondeos bloqueados durante una caída. Después de recuperar la dependencia, vuelve a comprobarla antes de anunciar disponibilidad. `/healthz` sigue comprobando únicamente que el proceso esté activo.
+
 Operación:
 
 ```sh

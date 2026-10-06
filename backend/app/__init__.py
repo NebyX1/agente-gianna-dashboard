@@ -10,6 +10,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 from app.config import config
 from app.extensions import cors, db, jwt, limiter, mail, migrate
+from app.services.readiness import ReadinessProbe
 from app.utils.responses import APIError, failure, success
 
 
@@ -130,20 +131,24 @@ def create_app(overrides=None):
     def health():
         return success({"status": "alive"})
 
-    @app.get("/readyz")
-    def ready():
-        try:
+    def check_dependencies():
+        # Each worker owns its Flask context and DB session until native I/O finishes.
+        with app.app_context():
             db.session.execute(sa.text("SELECT 1"))
             from app.models import User
 
             db.session.execute(sa.select(User.id).limit(1))  # Includes schema readiness.
-            if not limiter.storage.check():
-                raise RuntimeError()
+            return limiter.storage.check()
+
+    probe = ReadinessProbe(check_dependencies)
+    app.extensions["readiness_probe"] = probe
+
+    @app.get("/readyz")
+    def ready():
+        if probe.ready():
             return success({"status": "ready"})
-        except Exception:
-            db.session.rollback()
-            return failure(
-                APIError("not_ready", "Las dependencias requeridas no están disponibles", 503)
-            )
+        return failure(
+            APIError("not_ready", "Las dependencias requeridas no están disponibles", 503)
+        )
 
     return app
