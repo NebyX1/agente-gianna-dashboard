@@ -1872,7 +1872,8 @@
             "maxLength": 160
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "description": "active: nuevos, en curso y en espera. También admite un estado o varios separados por coma."
           },
           "origin_unit_id": {
             "type": "integer",
@@ -1881,6 +1882,27 @@
           "destination_unit_id": {
             "type": "integer",
             "minimum": 1
+          },
+          "problem_type_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "from": {
+            "type": "string",
+            "format": "date"
+          },
+          "to": {
+            "type": "string",
+            "format": "date"
           }
         },
         "required": []

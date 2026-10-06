@@ -9,6 +9,7 @@ class AgentTools:
     reads = {
         "catalogues": "tickets.catalogs.v1",
         "search_tickets": "tickets.search.v1",
+        "count_tickets": "tickets.search.v1",
         "read_ticket": "tickets.read.v1",
         "ticket_history": "tickets.history.v1",
         "open_board": "browser.open.v1",
@@ -17,7 +18,8 @@ class AgentTools:
     }
     descriptions = {
         "catalogues": "Consultar áreas, oficinas, municipios, destinos y tipos de problema REALES. Usar al preguntar qué áreas hay o si un nombre existe. No buscar tickets para listar áreas.",
-        "search_tickets": "Buscar tickets reales por texto o filtros; devuelve códigos e IDs reales.",
+        "search_tickets": "Buscar tickets reales por texto o filtros. total cuenta todos los resultados, items es una página. Activos: status=active. 'De un área' usa origin_unit_id del catálogo, no q. Para un número usá q con el código completo (25 = IDL-TI-000025) y verificá su coincidencia exacta. page/per_page permiten continuar una lista. Devuelve códigos e IDs reales distintos del número público.",
+        "count_tickets": "Contar tickets visibles con filtros reales sin descargar ni enumerar la lista. Por defecto cuenta activos (Nuevo, En curso, En espera), sin ocultos. Para 'cuántos de Tránsito/Sociales/otra área' usá origin_unit_id del catálogo; destination_unit_id sólo si pide los asignados a ese equipo. Devuelve el total exacto, aunque haya varias páginas.",
         "read_ticket": "Leer un ticket por su ID interno obtenido de search_tickets. El número del código no es el ID.",
         "ticket_history": "Consultar historial real por ID interno obtenido de search_tickets.",
         "open_board": "Abrir el tablero de tickets en el navegador propio.",
@@ -39,7 +41,24 @@ class AgentTools:
             if stable in s.profile["tools"] and stable in s.dispatcher.registry.tools:
                 entry = s.dispatcher.registry.tools[stable]
                 if entry in available:
-                    tools.append(self.definition(name, self.descriptions[name], entry.schema))
+                    parameters = entry.schema
+                    if name == "search_tickets":
+                        parameters = {
+                            **entry.schema,
+                            "properties": {
+                                **entry.schema["properties"],
+                                "per_page": {"type": "integer", "minimum": 1, "maximum": 10},
+                            },
+                        }
+                    if name == "count_tickets":
+                        parameters = schema(
+                            {
+                                k: v
+                                for k, v in entry.schema["properties"].items()
+                                if k not in {"page", "per_page"}
+                            }
+                        )
+                    tools.append(self.definition(name, self.descriptions[name], parameters))
         tools += [
             self.definition(
                 "prepare_request",
@@ -168,9 +187,21 @@ class AgentTools:
         Draft202012Validator(definitions[name]["parameters"]).validate(args)
         s = self.s
         if name in self.reads:
-            result = await s.tool(self.reads[name], args)
+            query = (
+                {**args, "status": args.get("status", "active"), "per_page": 1}
+                if name == "count_tickets"
+                else {"per_page": 10, **args}
+                if name == "search_tickets"
+                else args
+            )
+            result = await s.tool(self.reads[name], query)
             if name == "catalogues":
                 s.catalogs = result
+            if name == "count_tickets":
+                return {
+                    "total": result["total"],
+                    "filters": {k: v for k, v in query.items() if k != "per_page"},
+                }, False
             return result, False
         if s.state in {State.EXECUTING, State.RECONCILING}:
             raise ValueError("Hay una operación pendiente; primero hay que comprobarla")

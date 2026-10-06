@@ -52,9 +52,17 @@ def install_tools(registry, tickets, browser, supervisor):
             schema(
                 {
                     "q": {"type": "string", "maxLength": 160},
-                    "status": {"type": "string"},
+                    "status": {
+                        "type": "string",
+                        "description": "active: nuevos, en curso y en espera. También admite un estado o varios separados por coma.",
+                    },
                     "origin_unit_id": POSITIVE,
                     "destination_unit_id": POSITIVE,
+                    "problem_type_id": POSITIVE,
+                    "page": POSITIVE,
+                    "per_page": {"type": "integer", "minimum": 1, "maximum": 100},
+                    "from": {"type": "string", "format": "date"},
+                    "to": {"type": "string", "format": "date"},
                 }
             ),
             search,

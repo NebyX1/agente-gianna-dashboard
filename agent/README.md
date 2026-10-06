@@ -2,6 +2,8 @@
 
 Aplicación independiente de voz, con consola accesible y navegador propio. Prepara tickets con datos de los catálogos reales, revisa cada escritura, conserva un comprobante durable y vuelve a esperar «Gianna». La API realiza las escrituras; la vista previa del navegador nunca envía el formulario.
 
+Al conversar, `IDL-TI-000025` se llama **ticket número 25**, sin leer letras ni ceros. También podés decir «terminación 25», «ticket veinticinco» o «ticket ciento veintitrés». El número es único y se conserva todos los días. Preguntá «¿Cuántos tickets de Tránsito tengo activos?» o «¿Y de Sociales?»: Gianna consulta la cantidad real por área. [Referencias accesibles y ejemplos](docs/ticket-references.md).
+
 ## Inicio en un equipo nuevo
 
 Seguí primero la [guía de instalación rápida](../docs/instalacion-rapida.md). La instalación habitual usa tickets en `http://localhost:5173`, pantalla en `http://localhost:5174` y API en `http://localhost:5000`. El `.env` de **agent/** debe apuntar a esos servicios. Iniciá Docker antes de Gianna. La interpretación usa DeepSeek en Ollama Cloud y no requiere un daemon Ollama local.

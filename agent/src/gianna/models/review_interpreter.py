@@ -6,6 +6,8 @@ import re
 from pydantic import BaseModel, ConfigDict, Field
 
 from gianna.dialogue.interpretation import Reply, ReviewReply
+from gianna.dialogue.numbers import ticket_references
+from gianna.dialogue.spoken_text import code_number
 
 
 class ReviewMeaning(BaseModel):
@@ -29,6 +31,10 @@ hold: pide esperar, pausar o no enviar todavía. decline: rechaza lo revisado.
 other: pregunta, consulta o habla de algo distinto. unclear: intención dudosa.
 No apruebes condiciones pendientes, acciones futuras, dudas, negaciones,
 citas de terceros, menciones informativas de 'confirmo', ni otro ticket/estado.
+El código IDL-TI-000025 también se nombra 'ticket 25', 'número 25' o
+'terminación 25'. Es el número completo sin ceros de relleno, no el ID interno:
+terminación 25 no es el ticket 125 ni el 1025. Compará con display_code del
+borrador, nunca con el número de resource, que puede ser distinto.
 Una respuesta afirmativa clara al cambio recién revisado puede ser breve.
 Evaluá la oración completa y sus reservas, no la presencia de una palabra.
 """
@@ -43,6 +49,12 @@ class ReviewInterpreter:
             # Explicit ticket data is not an answer to the review, even if its
             # literal contents say 'confirmo'. Keep this boundary outside the LLM.
             return ReviewReply(Reply.UNKNOWN), ReviewMeaning(intent="other", confidence=100)
+        number = code_number(draft.get("display_code") or "")
+        references = ticket_references(text)
+        if number is not None and references and references != {number}:
+            # The semantic model may mistake a resource ID or partial ending for
+            # the public number. No conflicting/ambiguous reference grants consent.
+            return ReviewReply(Reply.UNKNOWN), ReviewMeaning(intent="other", confidence=100)
         policy = POLICY
         if source == "voice":
             policy += """\nLa respuesta proviene de reconocimiento de voz. Considerá similitud
@@ -51,6 +63,10 @@ o dos consonantes puede corresponder claramente al consentimiento solicitado
 en esta revisión. No exijas ortografía exacta. No apliques esta recuperación a
 palabras con otro sentido real ni a frases ajenas al pedido. Conservá toda
 negación, duda, condición o corrección: jamás las elimines para aprobar.
+En una palabra breve mal transcrita, sin otra autorización explícita en la
+oración, la recuperación fonética debe conservar las vocales y la cantidad de
+sílabas de una afirmación reconocible. Si además cambian vocales, aparecen
+sílabas extra o hacen falta varias sustituciones, no reconstruyas consentimiento.
 Si los sonidos no permiten identificar claramente la intención, mantené unclear.
 """
         meaning = await self.chat.request(

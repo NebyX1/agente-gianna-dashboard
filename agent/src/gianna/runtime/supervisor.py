@@ -18,7 +18,7 @@ from gianna.dialogue.interpretation import (
     review_reply,
 )
 from gianna.dialogue.slots import matches, resolve, catalogue_answer
-from gianna.dialogue.spoken_text import review, spoken_code
+from gianna.dialogue.spoken_text import accessible_ticket_text, review, spoken_code
 from gianna.dialogue.numbers import ticket_number
 from gianna.dialogue.conversation import (
     FIELD_PROMPTS,
@@ -218,6 +218,7 @@ class Supervisor:
         generation = generation or self.generation_id
         if generation != self.generation_id:
             return
+        text = accessible_ticket_text(text)
         utterance_id = str(uuid4())
         message = {
             "text": text,
@@ -1460,7 +1461,7 @@ class Supervisor:
             await self.say(self.last_speech["text"], arm_idle=True)
         elif self.last_receipt:
             await self.say(
-                "El código es " + spoken_code(self.last_receipt["code"]) + ".", arm_idle=True
+                "Es el ticket " + spoken_code(self.last_receipt["code"]) + ".", arm_idle=True
             )
         elif self.last_speech:
             await self.say(self.last_speech["text"], arm_idle=True)
@@ -1930,7 +1931,7 @@ class Supervisor:
                 if kind == "restore"
                 else await self.tool("tickets.search.v1", {"q": f"IDL-TI-{code:06d}"})
             )
-            rows = search["items"]
+            rows = [t for t in search["items"] if t["code"] == f"IDL-TI-{code:06d}"]
             if generation != self.generation_id or not self.user or self.user["id"] != actor:
                 return True
             if len(rows) != 1:
@@ -1955,7 +1956,7 @@ class Supervisor:
             if kind == "read":
                 await self.tool("browser.show.v1", {"ticket_id": ticket["id"]})
                 await self.say(
-                    f"{spoken_code(ticket['code'])}. {ticket['origin']['name']}. {ticket['description']}",
+                    f"Ticket {spoken_code(ticket['code'])}. {ticket['origin']['name']}. {ticket['description']}",
                     arm_idle=True,
                 )
                 return True

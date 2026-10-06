@@ -8,7 +8,7 @@ import re
 from enum import StrEnum
 
 from gianna.dialogue.activation import normalize
-from gianna.dialogue.numbers import SMALL, TENS
+from gianna.dialogue.numbers import NUMBER_WORDS
 
 
 class Intent(StrEnum):
@@ -138,13 +138,13 @@ def terminal_ticket_request(text: str) -> bool:
     decided by the bounded number parser; this function never selects a ticket.
     """
     value = normalize(text).strip(" .,!¿?¡")
-    words = "|".join([*SMALL, *TENS, "y", "o", "ticket", "numero"])
+    words = "|".join([*NUMBER_WORDS, "o", "ticket", "numero", "terminacion"])
     number = rf"(?:idl[ -]?ti[ -]?\d{{1,6}}|\d{{1,6}}(?:\s+(?:y|o)\s+\d{{1,6}})?|(?:{words})(?:\s+(?:{words}|\d{{1,6}})){{0,8}})"
     return bool(
         re.fullmatch(
             rf"(?:por favor )?(?:(?:podes|puedes|quiero|necesito) )?"
             rf"(?:finaliza|finalizar|termina|terminar|cerra|cierra|cerrar|resuelve|resolve|resolver|soluciona|cancela|cancelar|marca|marcar) "
-            rf"(?:el |este )?(?:ticket|pedido)(?: numero)?(?: {number})?(?: (?:como |a |en )?(?:resuelto|cancelado))?(?: por favor)?",
+            rf"(?:el |este )?(?:ticket|pedido)(?: (?:numero|terminacion))?(?: {number})?(?: (?:como |a |en )?(?:resuelto|cancelado))?(?: por favor)?",
             value,
         )
     )

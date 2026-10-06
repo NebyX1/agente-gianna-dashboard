@@ -129,7 +129,8 @@ class WhisperResident:
                 "no confirmo, no todavía, esperá, corregí, continuamos. "
                 "Vocabulario del sistema: áreas registradas, orígenes, oficinas, municipios, "
                 "destinos habilitados, tipos de problema, descripción, estado del ticket. "
-                "Informática, Tránsito, Sociales, Secretaría General."
+                "Informática, Tránsito, Sociales, Secretaría General. "
+                "Ticket número uno, terminación veinticinco, ticket ciento veintitrés."
             ),
             # Already segmented by the streaming VAD. A second VAD pass can
             # remove quiet words from a real microphone's accepted segment.

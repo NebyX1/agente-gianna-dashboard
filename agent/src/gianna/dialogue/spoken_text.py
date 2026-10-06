@@ -1,9 +1,23 @@
 import re
 
 
+TICKET_CODE = re.compile(r"\bIDL-TI-(\d{6,10})\b", re.I)
+
+
+def code_number(code):
+    """Public number, never a database resource ID."""
+    match = TICKET_CODE.fullmatch(code)
+    return int(match[1]) if match and int(match[1]) > 0 else None
+
+
 def spoken_code(code):
-    match = re.fullmatch(r"IDL-TI-(\d{6})", code)
-    return "I D L, T I, " + ", ".join(match[1]) if match else code
+    number = code_number(code)
+    return f"número {number}" if number is not None else code
+
+
+def accessible_ticket_text(text):
+    """Use the same short reference in generated replies and workflow speech."""
+    return TICKET_CODE.sub(lambda match: spoken_code(match[0]), text)
 
 
 def review(draft, catalogs):

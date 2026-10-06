@@ -226,7 +226,7 @@ async def test_repeat_question_keeps_current_draft_even_after_an_older_receipt(s
     await s.repeat()
     assert s.last_speech["text"] == question
     await s.repeat(code_only=True)
-    assert "0, 0, 0, 0, 0, 1" in s.last_speech["text"]
+    assert s.last_speech["text"] == "Es el ticket número 1."
 
 
 async def test_unclear_yes_does_not_replace_archive_reason_or_write(supervisor):

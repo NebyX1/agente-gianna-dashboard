@@ -11,6 +11,7 @@ from gianna.adapters.tickets_http import TicketError
 from gianna.models.ollama_cloud import CloudChat
 from gianna.runtime.agent_tools import AgentTools
 from gianna.dialogue.state_machine import State
+from gianna.dialogue.spoken_text import code_number, spoken_code
 from gianna.runtime.conversation_policy import POLICY
 
 
@@ -270,10 +271,32 @@ class ConversationAgent:
     @staticmethod
     def project(name, result):
         """Limit context after transport/schema validation, retaining factual IDs."""
+
+        def reference(ticket):
+            number = code_number(ticket.get("code", ""))
+            return (
+                {
+                    **ticket,
+                    "number": number,
+                    "spoken_reference": "ticket " + spoken_code(ticket["code"]),
+                }
+                if number is not None
+                else ticket
+            )
+
+        if name == "read_ticket" and "code" in result:
+            return reference(result)
         if name in {"search_tickets", "ticket_history"} and "items" in result:
             return {
                 **result,
-                "items": result["items"][:10],
+                "items": [reference(item) for item in result["items"][:10]]
+                if name == "search_tickets"
+                else result["items"][:10],
                 "items_in_context": min(10, len(result["items"])),
+                "has_more": (
+                    (result.get("page", 1) - 1) * result.get("per_page", len(result["items"]))
+                    + min(10, len(result["items"]))
+                    < result["total"]
+                ),
             }
         return result

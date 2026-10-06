@@ -67,6 +67,10 @@ CASES = [
     ("El botón dice confirmo, ¿qué significa?", False),
     ("¿Por qué no entendiste cuando dije confirmo?", False),
     ("Confirmo el ticket IDL-TI-000099", False),
+    ("Confirmo el ticket número 4", True),
+    ("Sí, guardá el cambio del ticket terminación cuatro", True),
+    ("Confirmo el ticket número 91", False),
+    ("Confirmo el ticket terminación catorce", False),
     ("Confirmo que lo pases a cancelado", False),
     ("Confirmo y borrá también el ticket dos", False),
     ("No quiero guardarlo todavía, continuamos después", False),
@@ -79,7 +83,7 @@ async def test_full_reply_against_actual_review(text, approve, live_chat):
     draft = Draft(
         1,
         tool="tickets.status.v1",
-        resource="tickets/4",
+        resource="tickets/91",
         display_code="IDL-TI-000004",
         payload={"version": 3, "status": "resolved", "note": "Informática resolvió el problema"},
     )
