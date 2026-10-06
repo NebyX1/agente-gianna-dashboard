@@ -264,6 +264,8 @@ test.describe.serial("producto real · MariaDB + Flask + Nginx + SMTP", () => {
     await draggable.focus();
     await op.keyboard.press("Space");
     await expect(op.getByTestId("drag-preview")).toBeVisible();
+    // The overlay renders before the keyboard sensor has measured its drop targets.
+    await expect(op.getByTestId("column-waiting")).toHaveClass(/drop-over/);
     await op.keyboard.press("ArrowLeft");
     await expect(op.getByTestId("column-in_progress")).toHaveClass(/drop-over/);
     await op.keyboard.press("Space");

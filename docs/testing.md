@@ -8,6 +8,8 @@ Se actualizaron esas dos comprobaciones para verificar el diseño vigente; no se
 
 La comprobación remota correspondiente se publica mediante el flujo [Verificación en GitHub Actions](https://github.com/NebyX1/agente-gianna-dashboard/actions/workflows/checks.yml). Los resultados anteriores de esta página son históricos y se conservan con sus fechas y alcance.
 
+La siguiente ejecución, `e0473fc`, detectó una carrera intermitente del E2E de teclado: la prueba esperaba la tarjeta flotante, pero enviaba ArrowLeft antes de esperar que el arrastre hubiera marcado su columna inicial. El E2E ahora espera esa condición real antes de mover. Se mantienen la comprobación de la columna de destino y la lectura del estado guardado en la API. Se verificaron cinco ciclos consecutivos de movimiento con Chromium ralentizado 4× por CDP, usando un solo ingreso normal con OTP: **3 escenarios passed en 32.1 s**, incluido el escenario ampliado de cinco ciclos. Un intento anterior de repetir todos los ingresos encontró el cooldown real de correo de 60 segundos; se conserva como fallido y no cuenta como validación del arrastre. No se desactivaron las protecciones de ingreso.
+
 ## Verificación local del 4 de octubre
 
 Verificación local ejecutada el 4 de octubre de 2026 en Windows/PowerShell, Docker Desktop con contenedores Linux y Chromium de Playwright. API de integración: Python 3.12.12, MariaDB 11.4.8, Redis 7.4.8, Mailpit 1.27.8; SPAs de producción servidas por Nginx 1.28.0. El host usó Python 3.12.14 y Node 22.15.1; los builds Docker usaron Node 22.23.3. Versiones y referencias completas en [arquitectura](architecture.md).
