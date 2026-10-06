@@ -347,8 +347,8 @@ test.describe.serial("producto real · MariaDB + Flask + Nginx + SMTP", () => {
     await audit();
     await op.getByRole("button", { name: "Nuevo ticket", exact: true }).click();
     await expect(op.getByRole("dialog").locator(".modal-box")).toHaveCSS(
-      "background-color",
-      "rgb(16, 24, 39)",
+      "background-image",
+      "linear-gradient(135deg, rgb(21, 35, 58), rgb(15, 27, 46))",
     );
     await audit();
     await op.keyboard.press("Escape");
@@ -543,7 +543,7 @@ test.describe.serial("producto real · MariaDB + Flask + Nginx + SMTP", () => {
         await tv.evaluate(
           () => getComputedStyle(document.documentElement).fontSize,
         ),
-      ).toBe(size.width >= 3000 ? "27px" : "16px");
+      ).toBe(size.width >= 3000 ? "24px" : "16px");
       await expect(
         tv.locator(".display-grid").getByText(all[0].code, { exact: true }),
       ).toBeVisible({ timeout: 12000 });

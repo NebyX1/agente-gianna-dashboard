@@ -1,5 +1,15 @@
 # Pruebas y evidencia
 
+## Corrección de la primera ejecución en GitHub · 6 de octubre de 2026
+
+La ejecución de `b7c7ac9` aprobó el agente, ambos clientes y los 57 tests del backend, pero se detuvo en el cuarto escenario de Playwright. Una aserción visual todavía esperaba un fondo plano del diseño anterior: el formulario nocturno actual tiene un degradado opaco. También quedaba la expectativa de 27 px en 4K, anterior al ajuste compacto a 24 px.
+
+Se actualizaron esas dos comprobaciones para verificar el diseño vigente; no se eliminaron escenarios, se ampliaron plazos ni se agregaron reintentos. La suite completa volvió a ejecutarse sobre una instalación nueva con MariaDB, Flask, Redis, Mailpit y las webs de producción: **8 passed en 44.5 s**. Esa ejecución utilizó un proyecto Docker descartable separado, con API 5500, frontend 5483 y visualizador 5484, para conservar las bases y sesiones de la demo.
+
+La comprobación remota correspondiente se publica mediante el flujo [Verificación en GitHub Actions](https://github.com/NebyX1/agente-gianna-dashboard/actions/workflows/checks.yml). Los resultados anteriores de esta página son históricos y se conservan con sus fechas y alcance.
+
+## Verificación local del 4 de octubre
+
 Verificación local ejecutada el 4 de octubre de 2026 en Windows/PowerShell, Docker Desktop con contenedores Linux y Chromium de Playwright. API de integración: Python 3.12.12, MariaDB 11.4.8, Redis 7.4.8, Mailpit 1.27.8; SPAs de producción servidas por Nginx 1.28.0. El host usó Python 3.12.14 y Node 22.15.1; los builds Docker usaron Node 22.23.3. Versiones y referencias completas en [arquitectura](architecture.md).
 
 ## Resultado ejecutado
