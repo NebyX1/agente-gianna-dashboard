@@ -104,6 +104,16 @@ async function contexts(browser: Browser) {
     tv: await viewer.newPage(),
   };
 }
+async function settleDragFrame(page: Page) {
+  // KeyboardSensor attaches its key listener in a later task. A visible overlay
+  // and initial collision can precede that listener and the geometry context.
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      }),
+  );
+}
 test.describe.serial("producto real · MariaDB + Flask + Nginx + SMTP", () => {
   let sessions: Awaited<ReturnType<typeof contexts>>;
   let ticket: Ticket;
@@ -266,8 +276,10 @@ test.describe.serial("producto real · MariaDB + Flask + Nginx + SMTP", () => {
     await expect(op.getByTestId("drag-preview")).toBeVisible();
     // The overlay renders before the keyboard sensor has measured its drop targets.
     await expect(op.getByTestId("column-waiting")).toHaveClass(/drop-over/);
+    await settleDragFrame(op);
     await op.keyboard.press("ArrowLeft");
     await expect(op.getByTestId("column-in_progress")).toHaveClass(/drop-over/);
+    await settleDragFrame(op);
     await op.keyboard.press("Space");
     await expect
       .poll(

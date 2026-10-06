@@ -1,5 +1,11 @@
 # Pruebas y evidencia
 
+## Referencias de tickets y sincronización del teclado · 6 de octubre de 2026
+
+Gianna nombra los tickets sin letras ni ceros de relleno y consulta cantidades reales por área. La entrega pasó 647 tests de agente/contratos, las 44 respuestas de confirmación, las consultas con DeepSeek y MariaDB y el reconocimiento con Piper/Whisper real de 1, 25 y 123. [Detalles y reproducción](../agent/docs/ticket-references.md).
+
+La ejecución remota de `ab56619` aprobó el agente, ambos clientes y el backend, pero encontró otra carrera en el escenario de teclado de Playwright: la colisión inicial puede verse antes de que `KeyboardSensor` termine de instalar su listener. La prueba espera dos cuadros de renderizado después de activar el arrastre y al llegar a la columna destino. Conserva las aserciones sobre el destino y el estado persistido; no agrega reintentos ni amplía plazos. Los ocho escenarios pasaron en 47.6 s sobre otro stack descartable con MariaDB, Flask, Redis, Mailpit y Nginx; la demo del usuario se conservó.
+
 ## Corrección de la primera ejecución en GitHub · 6 de octubre de 2026
 
 La ejecución de `b7c7ac9` aprobó el agente, ambos clientes y los 57 tests del backend, pero se detuvo en el cuarto escenario de Playwright. Una aserción visual todavía esperaba un fondo plano del diseño anterior: el formulario nocturno actual tiene un degradado opaco. También quedaba la expectativa de 27 px en 4K, anterior al ajuste compacto a 24 px.
